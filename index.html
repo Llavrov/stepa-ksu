@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Натальная карта Степана · 01.09.2002</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:     #07080f;
+    --deep:   #0d0f1c;
+    --gold:   #c9a96e;
+    --gold2:  #e8c97a;
+    --white:  #f0ede6;
+    --muted:  rgba(240,237,230,.48);
+    --faint:  rgba(240,237,230,.14);
+    --blue:   #7aa2d4;
+    --violet: #a07dd4;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--white);
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── STARS CANVAS ────────────────────────────────── */
+  #stars {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── SLIDES ─────────────────────────────────────── */
+  .deck { position: relative; width: 100vw; height: 100vh; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex;
+    opacity: 0; visibility: hidden;
+    transition: opacity .8s cubic-bezier(.4,0,.2,1), visibility 0s linear .8s;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .slide.active {
+    opacity: 1; visibility: visible;
+    transition: opacity .8s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── OVERLAYS ───────────────────────────────────── */
+  .fill-photo {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center top;
+  }
+  .ov-dark  { position: absolute; inset: 0; background: rgba(7,8,15,.78); }
+  .ov-left  { position: absolute; inset: 0; background: linear-gradient(to right, rgba(7,8,15,.96) 42%, rgba(7,8,15,.55) 70%, rgba(7,8,15,.1) 100%); }
+  .ov-right { position: absolute; inset: 0; background: linear-gradient(to left,  rgba(7,8,15,.96) 42%, rgba(7,8,15,.55) 70%, rgba(7,8,15,.1) 100%); }
+  .ov-bottom{ position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,8,15,.97) 0%, rgba(7,8,15,.45) 55%, transparent 100%); }
+  .ov-center{ position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(7,8,15,.3) 0%, rgba(7,8,15,.88) 100%); }
+
+  /* ── LAYOUT ─────────────────────────────────────── */
+  .col {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    padding: 0 7vw;
+    height: 100%;
+  }
+  .col.right { margin-left: auto; }
+  .col.center {
+    align-items: center; text-align: center;
+    margin: 0 auto; max-width: 880px;
+    padding: 0 6vw;
+  }
+  .col.wide { max-width: none; width: 100%; padding: 4vh 7vw; justify-content: flex-start; overflow-y: auto; }
+
+  /* ── TYPO ───────────────────────────────────────── */
+  .eyebrow {
+    font-size: 10.5px; letter-spacing: .28em;
+    text-transform: uppercase; color: var(--gold);
+    margin-bottom: 18px; font-weight: 600;
+  }
+  .rule { width: 36px; height: 2px; background: var(--gold); margin-bottom: 20px; flex-shrink: 0; }
+  .rule.center { margin: 0 auto 20px; }
+
+  h1 {
+    font-size: clamp(44px, 6.5vw, 84px);
+    font-weight: 700; line-height: 1.0; letter-spacing: -.025em;
+  }
+  h2 {
+    font-size: clamp(30px, 4.5vw, 58px);
+    font-weight: 700; line-height: 1.1; letter-spacing: -.02em;
+  }
+  h3 {
+    font-size: clamp(20px, 2.6vw, 34px);
+    font-weight: 600; line-height: 1.2; letter-spacing: -.01em;
+  }
+  .sub {
+    margin-top: 20px;
+    font-size: clamp(14px, 1.5vw, 18px);
+    color: var(--muted); line-height: 1.7; max-width: 540px;
+  }
+  .gold { color: var(--gold); }
+  .blue { color: var(--blue); }
+  .violet { color: var(--violet); }
+
+  /* ── TABLE ───────────────────────────────────────── */
+  .astro-table {
+    width: 100%; border-collapse: collapse;
+    margin-top: 22px;
+    font-size: clamp(12px, 1.3vw, 15px);
+  }
+  .astro-table th {
+    text-align: left; padding: 10px 14px;
+    font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--gold); border-bottom: 1px solid var(--faint);
+    font-weight: 600;
+  }
+  .astro-table td {
+    padding: 11px 14px; border-bottom: 1px solid var(--faint);
+    color: var(--muted); vertical-align: top; line-height: 1.5;
+  }
+  .astro-table td:first-child { color: var(--white); font-weight: 500; white-space: nowrap; }
+  .astro-table tr:last-child td { border-bottom: none; }
+
+  .callout {
+    margin-top: 20px;
+    padding: 16px 20px;
+    border-left: 3px solid var(--gold);
+    background: rgba(201,169,110,.08);
+    border-radius: 0 6px 6px 0;
+    font-size: clamp(12px, 1.3vw, 15px);
+    color: var(--muted); line-height: 1.65;
+  }
+  .callout strong { color: var(--white); }
+
+  /* ── TRAIT BLOCKS ────────────────────────────────── */
+  .traits {
+    margin-top: 22px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .trait {
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .trait-icon {
+    font-size: 18px; flex-shrink: 0; margin-top: 1px;
+  }
+  .trait-body { flex: 1; }
+  .trait-title {
+    font-size: clamp(13px,1.4vw,16px);
+    font-weight: 600; color: var(--white);
+    margin-bottom: 3px;
+  }
+  .trait-text {
+    font-size: clamp(11px,1.2vw,14px);
+    color: var(--muted); line-height: 1.6;
+  }
+
+  /* ── ACROSTIC ────────────────────────────────────── */
+  .acrostic {
+    margin-top: 30px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .acro-row {
+    display: flex; align-items: center; gap: 18px;
+  }
+  .acro-letter {
+    font-size: clamp(28px, 4vw, 52px);
+    font-weight: 800; color: var(--gold);
+    width: 60px; text-align: center; flex-shrink: 0;
+    letter-spacing: -.02em;
+  }
+  .acro-text {
+    font-size: clamp(13px, 1.5vw, 17px);
+    color: var(--muted); line-height: 1.4;
+  }
+  .acro-text strong { color: var(--white); }
+
+  /* ── FORECAST ────────────────────────────────────── */
+  .forecast {
+    margin-top: 24px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .season-card {
+    padding: 18px 20px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--faint);
+    border-radius: 10px;
+  }
+  .season-name {
+    font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 8px; font-weight: 600;
+  }
+  .season-text {
+    font-size: clamp(12px,1.2vw,14px);
+    color: var(--muted); line-height: 1.6;
+  }
+
+  /* ── ASPECTS ─────────────────────────────────────── */
+  .aspect-list {
+    margin-top: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .aspect {
+    padding: 16px 18px;
+    border-left: 2px solid var(--violet);
+    background: rgba(160,125,212,.07);
+    border-radius: 0 8px 8px 0;
+  }
+  .aspect-title {
+    font-size: clamp(13px,1.4vw,16px);
+    font-weight: 600; color: var(--white); margin-bottom: 5px;
+  }
+  .aspect-text {
+    font-size: clamp(11px,1.2vw,13px);
+    color: var(--muted); line-height: 1.6;
+  }
+
+  /* ── NAV ─────────────────────────────────────────── */
+  .dots {
+    position: fixed; bottom: 26px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 8px; z-index: 999;
+  }
+  .dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--faint); cursor: pointer;
+    transition: background .3s, transform .3s; border: none;
+  }
+  .dot.active { background: var(--gold); transform: scale(1.5); }
+
+  .counter {
+    position: fixed; top: 24px; right: 32px;
+    font-size: 10px; letter-spacing: .25em; color: var(--faint);
+    z-index: 999; font-variant-numeric: tabular-nums;
+  }
+  .arrow {
+    position: fixed; top: 50%; z-index: 999;
+    transform: translateY(-50%);
+    background: none; border: none;
+    color: var(--faint); font-size: 24px;
+    cursor: pointer; padding: 20px;
+    transition: color .25s; user-select: none;
+  }
+  .arrow:hover { color: var(--white); }
+  .arrow.prev { left: 8px; }
+  .arrow.next { right: 8px; }
+
+  /* ── SCROLL for wide slides ──────────────────────── */
+  .wide-inner {
+    max-height: 100vh;
+    overflow-y: auto;
+    padding: 8vh 7vw;
+    width: 100%;
+    scrollbar-width: none;
+  }
+  .wide-inner::-webkit-scrollbar { display: none; }
+
+  /* ── PHOTO HALF ──────────────────────────────────── */
+  .photo-half {
+    position: absolute; top: 0; bottom: 0;
+    width: 48%; overflow: hidden;
+  }
+  .photo-half img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center top;
+  }
+  .photo-half.left  { left: 0; }
+  .photo-half.right { right: 0; }
+  .photo-half.left::after  { content: ''; position: absolute; inset: 0; background: linear-gradient(to left,  var(--bg) 0%, transparent 60%); }
+  .photo-half.right::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, var(--bg) 0%, transparent 60%); }
+
+  /* ── CONSTELLATION DECO ──────────────────────────── */
+  .const-deco {
+    position: absolute; right: 6vw; top: 50%;
+    transform: translateY(-50%);
+    opacity: .12; z-index: 1;
+    font-size: 260px; line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="counter" id="counter">01 / 12</div>
+<button class="arrow prev" onclick="go(-1)">&#8592;</button>
+<button class="arrow next" onclick="go(+1)">&#8594;</button>
+<nav class="dots" id="dots"></nav>
+
+<div class="deck" id="deck">
+
+  <!-- ══ 1 TITLE ══════════════════════════════════════ -->
+  <div class="slide active" id="s1">
+    <img class="fill-photo" src="Степа/IMG_0249.jpeg" alt=""
+         style="filter: grayscale(30%) brightness(.55); object-position: center;">
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(7,8,15,.5) 0%, rgba(7,8,15,.75) 100%);"></div>
+    <!-- dawn gradient -->
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%, rgba(180,120,40,.18) 0%, transparent 60%);"></div>
+    <div class="col center" style="height:100%;justify-content:center;z-index:2;">
+      <div class="rule center"></div>
+      <div class="eyebrow" style="letter-spacing:.35em;">Натальная карта</div>
+      <h1 style="font-size:clamp(42px,6.5vw,80px); letter-spacing:-.03em;">
+        СТЕПАН<br><span class="gold">ХАЧАТРЯН</span>
+      </h1>
+      <div style="margin-top:22px; font-size:clamp(16px,2vw,22px); color:var(--muted); letter-spacing:.08em;">
+        01.09.2002 &nbsp;·&nbsp; 06:00 &nbsp;·&nbsp; Красноярск
+      </div>
+      <p class="sub" style="margin-top:24px; text-align:center; max-width:520px; margin-left:auto; margin-right:auto; font-style:italic; font-size:clamp(14px,1.6vw,19px); color:rgba(201,169,110,.75);">
+        «Рождённый на рассвете сам выбирает свой путь»
+      </p>
+      <div style="margin-top:40px; font-size:11px; letter-spacing:.3em; color:var(--faint); text-transform:uppercase;">
+        Рассветный воин
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 2 АСТРО-ДОСЬЕ ════════════════════════════════ -->
+  <div class="slide" id="s2">
+    <div class="const-deco">♍</div>
+    <div class="wide-inner" style="position:relative;z-index:2;">
+      <div class="eyebrow">Астро-досье</div>
+      <h2>Точные<br>координаты<span class="gold">.</span></h2>
+      <table class="astro-table">
+        <thead>
+          <tr><th>Параметр</th><th>Значение</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Дата рождения</td><td>1 сентября 2002 — <span style="color:var(--gold)">День знаний</span></td></tr>
+          <tr><td>Точное время</td><td>06:00 — рассвет</td></tr>
+          <tr><td>Место рождения</td><td>Красноярск</td></tr>
+          <tr><td>Знак Солнца</td><td>♍ <strong style="color:var(--white)">Дева (Virgo)</strong></td></tr>
+          <tr><td>Знак Луны</td><td>♏ <strong style="color:var(--white)">Скорпион (Scorpio)</strong></td></tr>
+          <tr><td>Восходящий знак</td><td>♍ <strong style="color:var(--white)">Дева (Virgo)</strong></td></tr>
+          <tr><td>Стихия</td><td>Земля (Солнце) + Вода (Луна)</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>Главное открытие:</strong> У Степана двойная Дева (Солнце + Асцендент) и Луна в Скорпионе.
+        Это делает его характер не просто сильным — монолитным.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 3 АСЦЕНДЕНТ ══════════════════════════════════ -->
+  <div class="slide" id="s3">
+    <div class="photo-half right">
+      <img src="Степа/IMG_0442.jpeg" alt="" style="filter:brightness(.75) saturate(.7);">
+    </div>
+    <div class="col" style="max-width:620px; padding-right:2vw;">
+      <div class="rule"></div>
+      <div class="eyebrow">Асцендент в Деве</div>
+      <h2>Твоё лицо<br>и <span class="gold">тело</span>.</h2>
+      <div class="traits">
+        <div class="trait">
+          <div class="trait-icon">👁</div>
+          <div class="trait-body">
+            <div class="trait-title">Внешность</div>
+            <div class="trait-text">Собранный, подтянутый. Даже если внутри ураган — снаружи спокойствие. Взгляд цепкий, ты замечаешь детали которые другие пропускают.</div>
+          </div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">🤝</div>
+          <div class="trait-body">
+            <div class="trait-title">Первое впечатление</div>
+            <div class="trait-text">Люди видят надёжность. Ты не разбрасываешься словами. Ты приходишь и делаешь.</div>
+          </div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">🛡</div>
+          <div class="trait-body">
+            <div class="trait-title">Твоя маска</div>
+            <div class="trait-text">Иногда кажешься холодным. Это не так — твоя Дева-стражник стоит у ворот и проверяет: свой? Можно впускать?</div>
+          </div>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:18px;">
+        <strong>Двойная Дева</strong> (Солнце + Асцендент) усиливает всё в два раза. Ты — эталонный земной знак.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 4 ЛУНА В СКОРПИОНЕ ═══════════════════════════ -->
+  <div class="slide" id="s4">
+    <img class="fill-photo" src="Степа/IMG_0196.jpeg" alt=""
+         style="filter:brightness(.35) saturate(.5); object-position:center top;">
+    <div class="ov-left"></div>
+    <div class="col" style="max-width:620px;">
+      <div class="rule"></div>
+      <div class="eyebrow">Луна в Скорпионе</div>
+      <h2>Твоя<br><span class="gold">бездна</span>.</h2>
+      <p style="margin-top:14px; font-size:clamp(13px,1.4vw,16px); color:var(--muted); line-height:1.6; max-width:480px;">
+        Снаружи ты — спокойная логичная Дева.<br>
+        Твоя <em style="color:var(--white); font-style:normal;">душа</em> живёт в Скорпионе.
+      </p>
+      <div class="traits" style="margin-top:18px;">
+        <div class="trait">
+          <div class="trait-icon">🌊</div>
+          <div class="trait-body"><div class="trait-title">Глубина</div><div class="trait-text">Ты не умеешь чувствовать «слегка». Если больно — то до дна. Если радостно — до неба. Если любишь — то навсегда.</div></div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">🔒</div>
+          <div class="trait-body"><div class="trait-title">Скрытность</div><div class="trait-text">Твои переживания — твоя территория. Людям нужно заслужить право зайти туда.</div></div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">⚡</div>
+          <div class="trait-body"><div class="trait-title">Магнетизм</div><div class="trait-text">Людям с тобой интересно, хотя не всегда понятно почему. Ты чувствуешь их слабые места — но не используешь это во вред.</div></div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">🧭</div>
+          <div class="trait-body"><div class="trait-title">Интуиция</div><div class="trait-text">Ты <em style="font-style:normal;color:var(--white)">знаешь</em> вещи, не имея объяснений. Обмануть тебя невозможно.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 5 СОЛНЦЕ В ДЕВЕ ══════════════════════════════ -->
+  <div class="slide" id="s5">
+    <div class="photo-half right">
+      <img src="Степа/IMG_0892.jpeg" alt="" style="filter:brightness(.8);">
+    </div>
+    <div class="col" style="max-width:600px;">
+      <div class="rule"></div>
+      <div class="eyebrow">Солнце в Деве</div>
+      <h2>Твой<br><span class="gold">свет</span>.</h2>
+      <p class="sub" style="max-width:460px; margin-top:14px;">Твоя сознательная часть — как ты мыслишь, твои ценности, твой двигатель.</p>
+      <div class="traits" style="margin-top:20px;">
+        <div class="trait">
+          <div class="trait-icon">🔬</div>
+          <div class="trait-body"><div class="trait-title">Анализ</div><div class="trait-text">Ты раскладываешь любую задачу на детали. Хаос — твой враг. Порядок — твой друг.</div></div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">🧠</div>
+          <div class="trait-body"><div class="trait-title">Критическое мышление</div><div class="trait-text">Ты не веришь на слово. Это делает тебя неуязвимым для манипуляций.</div></div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">💪</div>
+          <div class="trait-body"><div class="trait-title">Трудолюбие</div><div class="trait-text">Если Дева взялась за дело — оно будет сделано идеально. Ты перфекционист. И это реально работает.</div></div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">🤲</div>
+          <div class="trait-body"><div class="trait-title">Служение</div><div class="trait-text">Ты хочешь быть полезным. Друг-Дева никогда не бросит в беде.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 6 КЛЮЧЕВЫЕ ПЛАНЕТЫ ════════════════════════════ -->
+  <div class="slide" id="s6">
+    <div class="const-deco" style="opacity:.08; font-size:220px;">♃</div>
+    <div class="wide-inner" style="position:relative;z-index:2;">
+      <div class="eyebrow">Ключевые планеты</div>
+      <h2>Усилители<br><span class="gold">судьбы</span>.</h2>
+      <table class="astro-table" style="margin-top:24px;">
+        <thead>
+          <tr><th>Планета</th><th>Положение</th><th>Что это значит</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>☿ Меркурий</td>
+            <td><span class="gold">Весы · 7-й дом</span></td>
+            <td>Твой ум настроен на гармонию и партнёрство. Ты умеешь договариваться, быть дипломатом.</td>
+          </tr>
+          <tr>
+            <td>♀ Венера</td>
+            <td><span class="gold">Весы · 7-й дом</span></td>
+            <td>Твоя любовь ищет равновесия. Тебе нужны красивые, умные, достойные люди — в дружбе, любви, работе. Ты не размениваешься.</td>
+          </tr>
+          <tr>
+            <td>♂ Марс</td>
+            <td><span class="gold">Стрелец · 10-й дом</span></td>
+            <td>Это космос. Энергия в доме карьеры и в знаке приключений. Ты будешь гореть на работе. Нужна большая и далёкая цель — чтобы разогнаться.</td>
+          </tr>
+          <tr>
+            <td>♃ Юпитер</td>
+            <td><span class="gold">Лев · 5-й дом</span></td>
+            <td>Удача — в творчестве и в радости. Умей расслабляться и получать кайф от жизни — и удача придёт сама.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout" style="margin-top:20px;">
+        <strong>Дева (логика) + Скорпион (чутьё)</strong> = гениальный стратег. Ты просчитываешь варианты, но в нужный момент включаешь чуйку и делаешь идеальный ход.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 7 АСПЕКТЫ ════════════════════════════════════ -->
+  <div class="slide" id="s7">
+    <div class="photo-half left">
+      <img src="Степа/IMG_7210.jpeg" alt="" style="filter:brightness(.6) saturate(.6);">
+    </div>
+    <div class="col right" style="max-width:600px; padding-left:2vw;">
+      <div class="rule"></div>
+      <div class="eyebrow">Аспекты судьбы</div>
+      <h2>Что написано<br>на <span class="gold">небе</span>.</h2>
+      <div class="aspect-list">
+        <div class="aspect">
+          <div class="aspect-title">☉ Соединение Солнца и Асцендента</div>
+          <div class="aspect-text">Ты — цельная личность. Внешность и суть совпадают. Ты не играешь ролей — ты просто <em style="font-style:normal;color:var(--white)">есть</em>. Огромная внутренняя сила.</div>
+        </div>
+        <div class="aspect">
+          <div class="aspect-title">♂ Марс квадрат Сатурн</div>
+          <div class="aspect-text">Напряжение между «хочу прорываться» и «надо подождать». Жизнь иногда тормозит. Не бесись — это проверка. Пройдёшь — получишь всё.</div>
+        </div>
+        <div class="aspect">
+          <div class="aspect-title">☽ Луна в трине к Нептуну</div>
+          <div class="aspect-text">Мистический аспект. Вещие сны. Интуиция — твой главный советчик. Доверяй ей.</div>
+        </div>
+        <div class="aspect">
+          <div class="aspect-title">♀ Венера секстиль Юпитер</div>
+          <div class="aspect-text">Аспект счастливой любви и счастливой дружбы. Тебя будут любить. Отношения будут складываться легко — если сам не будешь их усложнять.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 8 ДОМА ════════════════════════════════════════ -->
+  <div class="slide" id="s8">
+    <div class="const-deco" style="opacity:.06; font-size:300px; right:3vw;">⊕</div>
+    <div class="wide-inner" style="position:relative;z-index:2;">
+      <div class="eyebrow">Дома гороскопа</div>
+      <h2>Где искать<br><span class="gold">сокровища</span> в Красноярске.</h2>
+      <table class="astro-table" style="margin-top:22px;">
+        <thead>
+          <tr><th>Дом</th><th>Сфера</th><th>Место</th><th>Миссия</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1-й (Дева)</td><td>Ты сам</td><td>Весь город</td><td>Быть собой. Твоя личность — главный инструмент.</td></tr>
+          <tr><td>4-й (Стрелец)</td><td>Дом, семья</td><td>Твоя квартира</td><td>Сделать её крепостью. Место, куда хочется возвращаться.</td></tr>
+          <tr><td>5-й (Водолей)</td><td>Творчество, радость</td><td>Необычные тусовки</td><td>Найти людей, с которыми можно быть сумасшедшим.</td></tr>
+          <tr><td>7-й (Весы)</td><td>Партнёрство</td><td>Набережная, кафе</td><td>Встретить своих людей. Тех, кто станет опорой.</td></tr>
+          <tr><td>9-й (Козерог)</td><td>Путешествия, цели</td><td>Столбы, горы</td><td>Ставить большие цели и достигать их.</td></tr>
+          <tr><td>10-й (Водолей)</td><td>Карьера</td><td>Центр города</td><td>Взлететь. Сделать имя. Стать тем, кем хочешь стать.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ 9 ПРОГНОЗ ════════════════════════════════════ -->
+  <div class="slide" id="s9">
+    <img class="fill-photo" src="Степа/IMG_0250.jpeg" alt=""
+         style="filter:grayscale(50%) brightness(.4);">
+    <div class="ov-right"></div>
+    <div class="col right" style="max-width:600px; padding-left:2vw;">
+      <div class="rule"></div>
+      <div class="eyebrow">Прогноз · Первый год</div>
+      <h2>Что ждёт<br>в <span class="gold">Красноярске</span>.</h2>
+      <div class="forecast">
+        <div class="season-card">
+          <div class="season-name">🌸 Весна 2026</div>
+          <div class="season-text">Адаптация. Дева наводит порядок в голове и в быту. Знакомства, присматривание. Не форсируй.</div>
+        </div>
+        <div class="season-card">
+          <div class="season-name">☀️ Лето 2026</div>
+          <div class="season-text">Время Скорпиона. Уйдёшь вглубь себя. Анализ, размышления. Марс требует движения — езжай на море.</div>
+        </div>
+        <div class="season-card">
+          <div class="season-name">🍂 Осень 2026</div>
+          <div class="season-text">Пробуждение. Марс в 10-м доме начнёт разгон. Карьерные предложения, важные встречи. Ты выйдешь из тени.</div>
+        </div>
+        <div class="season-card">
+          <div class="season-name">❄️ Зима 2027</div>
+          <div class="season-text">Твой звёздный час. Венера и Юпитер — счастливый аспект. Любовь, дружба, признание.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 10 КОМПАС ════════════════════════════════════ -->
+  <div class="slide" id="s10">
+    <div class="const-deco" style="font-size:320px; opacity:.05;">🧭</div>
+    <div class="col" style="max-width:680px; position:relative;z-index:2;">
+      <div class="rule"></div>
+      <div class="eyebrow">Путеводный компас</div>
+      <h2>Степан —<br>по буквам<span class="gold">.</span></h2>
+      <div class="acrostic">
+        <div class="acro-row"><div class="acro-letter">С</div><div class="acro-text"><strong>Скорпион</strong> — твоя глубина, интуиция, страсть</div></div>
+        <div class="acro-row"><div class="acro-letter">Т</div><div class="acro-text"><strong>Труд</strong> — твоя Дева, твоя опора, твоя сила</div></div>
+        <div class="acro-row"><div class="acro-letter">Е</div><div class="acro-text"><strong>Единство</strong> — с теми, кого впустил в сердце</div></div>
+        <div class="acro-row"><div class="acro-letter">П</div><div class="acro-text"><strong>Путь</strong> — твой Марс, твоё движение вперёд</div></div>
+        <div class="acro-row"><div class="acro-letter">А</div><div class="acro-text"><strong>Абсолют</strong> — твоя цель, твоя вершина</div></div>
+        <div class="acro-row"><div class="acro-letter">Н</div><div class="acro-text"><strong>Надёжность</strong> — то, что ты даришь людям</div></div>
+      </div>
+      <p class="sub" style="margin-top:24px; font-style:italic; color:rgba(201,169,110,.6);">
+        Следуй за буквами своего имени — они не обманут.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══ 11 НАПУТСТВИЕ ════════════════════════════════ -->
+  <div class="slide" id="s11">
+    <img class="fill-photo" src="Степа/IMG_1016.jpeg" alt=""
+         style="filter:brightness(.45) saturate(.7);">
+    <div style="position:absolute;inset:0;background:linear-gradient(to right, rgba(7,8,15,.95) 48%, rgba(7,8,15,.4) 100%);"></div>
+    <div class="col" style="max-width:640px; overflow-y:auto;">
+      <div class="rule"></div>
+      <div class="eyebrow">Главное напутствие</div>
+      <h2 style="font-size:clamp(26px,3.5vw,46px);">Степан.<br>Ты родился<br>на рассвете<span class="gold">.</span></h2>
+      <p class="sub" style="margin-top:18px; max-width:520px;">В 6 утра, когда мир просыпается и наполняется светом. Это не случайность.</p>
+      <div class="traits" style="margin-top:20px;">
+        <div class="trait">
+          <div class="trait-icon">🧭</div>
+          <div class="trait-body"><div class="trait-title">Доверяй интуиции</div><div class="trait-text">Луна в Скорпионе никогда не ошибается. Если внутри екнуло — не делай. Если зажглось — беги туда.</div></div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">🛡</div>
+          <div class="trait-body"><div class="trait-title">Не бойся быть уязвимым</div><div class="trait-text">Твоя броня иногда мешает людям понять, как тебе нужна поддержка. С нами можно снимать броню.</div></div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">⚡</div>
+          <div class="trait-body"><div class="trait-title">Твоя сила — в действии</div><div class="trait-text">Марс в Стрельце не терпит застоя. Если плохо — иди на Столбы. Если хорошо — иди к людям.</div></div>
+        </div>
+        <div class="trait">
+          <div class="trait-icon">📚</div>
+          <div class="trait-body"><div class="trait-title">Ты родился в День знаний</div><div class="trait-text">Вся твоя жизнь — процесс познания. Ты — вечный студент. Красноярск — твой новый университет.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 12 ФИНАЛ ═════════════════════════════════════ -->
+  <div class="slide" id="s12">
+    <img class="fill-photo" src="Степа/IMG_0090.jpeg" alt=""
+         style="filter:brightness(.35) saturate(.5);">
+    <div class="ov-center"></div>
+    <div class="col center" style="height:100%; justify-content:center; z-index:2;">
+      <div style="font-size:28px; margin-bottom:20px; opacity:.5;">☽ ♍ ☀</div>
+      <div class="rule center"></div>
+      <div class="eyebrow" style="letter-spacing:.3em;">Натальная карта Степана Хачатряна</div>
+      <h2 style="font-size:clamp(28px,4vw,54px); max-width:700px; text-align:center;">
+        «Рассвет, 1 сентября 2002»
+      </h2>
+      <p class="sub" style="text-align:center; margin:20px auto 0; max-width:500px; font-style:italic; color:rgba(201,169,110,.75); font-size:clamp(15px,1.8vw,21px);">
+        Составлено по звёздам<br>и по велению сердца.
+      </p>
+      <div style="margin-top:36px; padding:18px 32px; border:1px solid rgba(201,169,110,.3); border-radius:8px; display:inline-block;">
+        <div style="font-size:clamp(18px,2.4vw,28px); font-weight:700; letter-spacing:.05em; color:var(--gold);">
+          Добро пожаловать домой.
+        </div>
+      </div>
+      <div style="margin-top:32px; font-size:11px; letter-spacing:.3em; color:var(--faint); text-transform:uppercase;">
+        Красноярск · 2026
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<script>
+  // ── STARFIELD ──────────────────────────────────────
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < 280; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.2 + .2,
+        a: Math.random() * .7 + .15,
+        speed: Math.random() * .003 + .001,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+  function drawStars(t) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      const a = s.a * (.7 + .3 * Math.sin(t * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220,215,200,${a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+  resize(); initStars(); requestAnimationFrame(drawStars);
+  window.addEventListener('resize', () => { resize(); initStars(); });
+
+  // ── SLIDES ────────────────────────────────────────
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const counterEl = document.getElementById('counter');
+  let cur = 0;
+
+  slides.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.className = 'dot' + (i === 0 ? ' active' : '');
+    b.onclick = () => goTo(i);
+    dotsEl.appendChild(b);
+  });
+
+  function goTo(n) {
+    slides[cur].classList.remove('active');
+    dotsEl.children[cur].classList.remove('active');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].classList.add('active');
+    dotsEl.children[cur].classList.add('active');
+    const num = String(cur + 1).padStart(2, '0');
+    const tot = String(slides.length).padStart(2, '0');
+    counterEl.textContent = num + ' / ' + tot;
+  }
+  function go(d) { goTo(cur + d); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') go(+1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')  go(-1);
+  });
+
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = tx - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 40) go(dx > 0 ? +1 : -1);
+  });
+</script>
+</body>
+</html>
